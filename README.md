@@ -50,7 +50,7 @@ http://www.codeeel.com/?p=365
 
 ## 注意事项
 
-1. `upload/uc_client/control/user.php` 的修改记录可以查看: [add ldap](https://github.com/zogodo/discuz_with_ldap/commit/37b231d57202eec05a2cd0b7c6f20d328800a04c)
+1. `upload/uc_client/control/user.php` 的修改记录可以查看: [add ldap](https://github.com/zogodo/discuz_with_ldap/commit/6f79ce6)
 2. Discuz 限制用户名长度最多15位, 写死在代码里的无法配置, 如果你们公司的 Ldap 用户名有超过15位的, 还需要修改 `upload/uc_client/model/user.php` 和修改数据库表 `common_member` 的 `username` 字段最大长度.
-3. `upload/uc_client/model/user.php` 的修改方法请查看: [fix max username len](https://github.com/zogodo/discuz_with_ldap/commit/fb1cb0a37b96a32ee072d3420dce4f408f2f27b2)
+3. `upload/uc_client/model/user.php` 的修改方法请查看: [fix max username len](https://github.com/zogodo/discuz_with_ldap/commit/a732a9c)
 
