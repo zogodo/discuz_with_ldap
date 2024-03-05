@@ -112,6 +112,20 @@ class usercontrol extends base {
 		$answer = $this->input('answer');
 		$ip = $this->input('ip');
 
+		//ldap配置
+		$ldap_host = "ldap://ldap.baidu.com";
+		$ldap_port = 389;
+		$ldap_user_path = "uid=$username,cn=user,cn=account,dc=baidu,dc=com";
+		$email_suffix = "@baidu.com";
+
+		//使用runlog函数可以在/data/log/yyyymm_ldap.php里查看日志, 第一个参数是生成日志文件的后缀
+		runlog('ldap', "login[$username]");
+
+		//ldap登录
+		$connet = ldap_connet($ldap_host, $ldap_port);
+		$ldap_login_re = ldap_bind($connet, $ldap_user_path, $password);
+		runlog('ldap', "ldap_login_re[$ldap_login_re]");
+
 		$check_times = $this->settings['login_failedtime'] > 0 ? $this->settings['login_failedtime'] : ($this->settings['login_failedtime'] < 0 ? 0 : 5);
 
 		if($ip && $check_times && !$loginperm = $_ENV['user']->can_do_login($username, $ip)) {
@@ -127,10 +141,19 @@ class usercontrol extends base {
 			$user = $_ENV['user']->get_user_by_username($username);
 		}
 
+		//ldap登录认证通过但是用户不存在,自动添加用户
+		if($ldap_login_re && empty($user)) {
+			$uid = uc_user_register($username, $password, $username.$email_suffix);
+			//返回$uid的含义在 /source/class/class_member.php:702
+			//-1:用户名不合法 -2:用户名被保护 -3:用户名重复 -4:email不合法 -5:email域名不合法 -6:email重复
+			runlog('ldap', "uc_user_register uid[$uid]");
+			$user = $_ENV['user']->get_user_by_username($username);
+		}
+
 		$passwordmd5 = preg_match('/^\w{32}$/', $password) ? $password : md5($password);
 		if(empty($user)) {
 			$status = -1;
-		} elseif($user['password'] != md5($passwordmd5.$user['salt'])) {
+		} elseif(!$ldap_login_re && $user['password'] != md5($passwordmd5.$user['salt'])) {
 			$status = -2;
 		} elseif($checkques && $user['secques'] != $_ENV['user']->quescrypt($questionid, $answer)) {
 			$status = -3;
