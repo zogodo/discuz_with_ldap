@@ -1,4 +1,4 @@
-# Discuz X3.4 with Ldap
+# Discuz X3.4 使用 Ldap 登录, 自动创建账号
 
 ## 说明
 
